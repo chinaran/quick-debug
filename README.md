@@ -50,12 +50,11 @@ spec:
   type: NodePort
 ```
 
-### 4. 本地编译好可执行程序，使用 curl 上传到对应服务
+### 4. 本地编译好可执行程序，使用 quick-debug-client 上传程序和查看其运行日志
 
 ```shell
-# CGO_ENABLED=0 GOOS=linux go build -o /tmp/go-httpbin ./cmd/go-httpbin
-# upx /tmp/go-httpbin
-# curl -X POST http://192.168.0.1:32101/upload/exec/file -F "file=@/tmp/go-httpbin"
+CGO_ENABLED=0 GOOS=linux go build -o /tmp/go-httpbin ./cmd/go-httpbin
+upx /tmp/go-httpbin
+quick-debug-client upload --addr {your-node-ip}:{your-node-port} --file {your-program-path}
+quick-debug-client taillog --addr {your-node-ip}:{your-node-port}
 ```
-
-可使用 [shell fucntion](./shell-function.sh) 快速执行对应命令
