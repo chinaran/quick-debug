@@ -1,6 +1,7 @@
-package main
+package server
 
 import (
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -9,14 +10,14 @@ import (
 	"syscall"
 )
 
-func quickDebug() {
+func QuickDebug(cmdArgs *CmdArgs) {
 	signalCh := make(chan os.Signal)
 	quitCh := make(chan struct{})
 	// 监听信号
 	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	cmd := new(ExecCmd)
 	cmd.Lock()
-	go runExec(cmd)
+	go runExec(cmd, cmdArgs)
 	go func() {
 		defer log.Println("exec worker exit")
 		for {
@@ -30,31 +31,45 @@ func quickDebug() {
 				cmd.Lock()
 				log.Println("restart with new exec file")
 				if err := cmd.Process.Kill(); err != nil {
-					log.Fatalf("kill %d err: %s", cmd.Process.Pid, err)
+					log.Printf("Warn: kill %d err: %s", cmd.Process.Pid, err)
 				}
 				err := os.Rename(exec.ExecPath, cmdArgs.ExecPath)
 				if err != nil {
 					log.Fatalf("os.Rename %s to %s err: %s", exec.ExecPath, cmdArgs.ExecPath, err)
 				}
-				go runExec(cmd)
+				go runExec(cmd, cmdArgs)
 			}
 		}
 	}()
 
-	go execFileServer(cmdArgs.ExecPort)
+	go startQuickDebugServer(cmdArgs.ExecPort)
 
 	s := <-signalCh
 	log.Println("receive exit signal:", s)
 	quitCh <- struct{}{}
 }
 
-func runExec(cmd *ExecCmd) {
+func runExec(cmd *ExecCmd, cmdArgs *CmdArgs) {
+	var err error
 	cmd.Cmd = exec.Command(cmdArgs.ExecPath, cmdArgs.ExecArgs...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	if cmdArgs.DisableExecLogFile {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	} else {
+		if cmd.logFile != nil {
+			cmd.logFile.Close()
+			cmd.logFile = nil
+		}
+		cmd.logFile, err = os.Create(logFilePath)
+		if err != nil {
+			log.Fatalf("failed to create %s: %v", logFilePath, err)
+		}
+		cmd.Stdout = io.MultiWriter(os.Stdout, cmd.logFile)
+		cmd.Stderr = io.MultiWriter(os.Stderr, cmd.logFile)
+	}
 	log.Printf("start run: %s %s", cmdArgs.ExecPath, strings.Join(cmdArgs.ExecArgs, " "))
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
 		log.Fatalf("failed to call cmd.Start(): %v", err)
 	}

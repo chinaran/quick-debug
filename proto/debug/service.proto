@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package debug;
+
+option go_package = "debug";
+
+message UploadFileRequest {
+    // file chunk
+    bytes fileChunk = 1;
+}
+
+message UploadFileResponse {
+    // reponse code
+    int32 code = 1;
+    // response message
+    string message = 2;
+}
+
+message TailLogRequest {
+    // tail -f
+    bool follow = 1;
+    // tail from the last Nth location (byte, not line)
+    // 0: from file header
+    int64 n = 2;
+}
+
+message TailLogResponse {
+    // log content
+    string content = 1;
+}
+
+// QuickDebug is the QuickDebug service.
+service QuickDebug {
+
+    rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse) {}
+
+    rpc TailLog(TailLogRequest) returns (stream TailLogResponse) {}
+
+}
