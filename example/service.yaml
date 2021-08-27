@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-httpbin
+  namespace: ran-debug
+spec:
+  ports:
+    - name: http-80-80
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: go-httpbin
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-httpbin-nodeport
+  namespace: ran-debug
+spec:
+  ports:
+    - name: quick-deubg
+      nodePort: 32102
+      port: 60006
+      protocol: TCP
+      targetPort: 60006
+  selector:
+    app: go-httpbin
+  type: NodePort

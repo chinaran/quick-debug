@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-httpbin
+  namespace: ran-debug
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-httpbin
+  template:
+    metadata:
+      labels:
+        app: go-httpbin
+    spec:
+      containers:
+        - args:
+            - -port
+            - "80"
+            - -response-delay
+            - 10ms
+          command:
+            - quick-debug
+            - --exec-path=/bin/go-httpbin
+            - exec-args
+          image: chinalan/go-httpbin:1.2-quick-debug
+          name: go-httpbin
+          resources:
+            limits:
+              cpu: 50m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi

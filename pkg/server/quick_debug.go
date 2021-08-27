@@ -13,6 +13,7 @@ import (
 func QuickDebug(cmdArgs *CmdArgs) {
 	signalCh := make(chan os.Signal)
 	quitCh := make(chan struct{})
+	doneCh := make(chan struct{})
 	// 监听信号
 	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	cmd := new(ExecCmd)
@@ -26,6 +27,7 @@ func QuickDebug(cmdArgs *CmdArgs) {
 				if err := cmd.Process.Kill(); err != nil {
 					log.Printf("kill %d err: %s", cmd.Process.Pid, err)
 				}
+				doneCh <- struct{}{}
 				return
 			case exec := <-execCh:
 				cmd.Lock()
@@ -45,8 +47,9 @@ func QuickDebug(cmdArgs *CmdArgs) {
 	go startQuickDebugServer(cmdArgs.ExecPort)
 
 	s := <-signalCh
-	log.Println("receive exit signal:", s)
 	quitCh <- struct{}{}
+	<-doneCh
+	log.Println("receive exit signal:", s)
 }
 
 func runExec(cmd *ExecCmd, cmdArgs *CmdArgs) {

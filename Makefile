@@ -1,4 +1,4 @@
-.PHONY: all build
+.PHONY: all build local
 
 all: proto-gen build
 
@@ -12,11 +12,14 @@ proto-gen:
 
 build:
 	go vet ./cmd/quick-debug
-	CGO_ENABLED=0 GOOS=linux go build -o quick-debug ./cmd/quick-debug
-	upx quick-debug
+	CGO_ENABLED=0 GOOS=linux go build -o ./bin/quick-debug ./cmd/quick-debug
+	go vet ./cmd/quick-debug-client
+	CGO_ENABLED=0 GOOS=linux go build -o ./bin/quick-debug-client ./cmd/quick-debug-client
+
+install: local
 
 local:
 	go vet ./cmd/quick-debug
-	go build -o quick-debug ./cmd/quick-debug
+	go install ./cmd/quick-debug
 	go vet ./cmd/quick-debug-client
-	go build -o quick-debug-client ./cmd/quick-debug-client
+	go install ./cmd/quick-debug-client
