@@ -15,10 +15,12 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// QuickDebugServer ...
 type QuickDebugServer struct {
 	pbDebug.UnimplementedQuickDebugServer
 }
 
+// NewQuickDebugServer ...
 func NewQuickDebugServer() *QuickDebugServer {
 	return &QuickDebugServer{}
 }
@@ -36,6 +38,7 @@ func startQuickDebugServer(port int) {
 	s.Serve(lis)
 }
 
+// UploadFile ...
 func (s *QuickDebugServer) UploadFile(stream pbDebug.QuickDebug_UploadFileServer) error {
 	log.Println("Start receive file ...")
 	// Save the file to specific dst path.
@@ -88,6 +91,7 @@ func (s *QuickDebugServer) UploadFile(stream pbDebug.QuickDebug_UploadFileServer
 	}
 }
 
+// TailLog ...
 func (*QuickDebugServer) TailLog(req *pbDebug.TailLogRequest, stream pbDebug.QuickDebug_TailLogServer) error {
 	config := tail.Config{
 		Follow: req.GetFollow(),

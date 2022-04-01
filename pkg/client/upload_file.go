@@ -13,9 +13,11 @@ import (
 )
 
 const (
+	// ChunkSize for reading uploaded file
 	ChunkSize = 64 * 1024 // 64KB
 )
 
+// UploadFile ...
 func UploadFile(cliCtx *cli.Context) (err error) {
 	var (
 		addr     = cliCtx.String("addr")
@@ -48,7 +50,7 @@ func uploadFile(c pbDebug.QuickDebugClient, filePath string) error {
 	defer stream.CloseSend()
 
 	startAt := time.Now()
-	buf := make([]byte, ChunkSize, ChunkSize)
+	buf := make([]byte, ChunkSize)
 	for {
 		n, err := file.Read(buf)
 		if err != nil {

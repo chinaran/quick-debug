@@ -1,4 +1,4 @@
-.PHONY: all build local
+.PHONY: all build local lint
 
 all: proto-gen build
 
@@ -9,6 +9,10 @@ proto-gen:
 		-I="${GOPATH}/src/github.com/gogo/protobuf/protobuf" \
 		--gogofaster_out=plugins=grpc:. \
 		./proto/debug/*.proto \
+
+lint:
+	@# golangci-lint run ./...
+	revive -formatter friendly ./...
 
 build:
 	go vet ./cmd/quick-debug

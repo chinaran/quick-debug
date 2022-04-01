@@ -14,6 +14,7 @@ var (
 	execCh = make(chan *ExecInfo, 10)
 )
 
+// CmdArgs ...
 type CmdArgs struct {
 	ExecPort           int
 	ExecPath           string
@@ -21,10 +22,12 @@ type CmdArgs struct {
 	ExecArgs           []string
 }
 
+// ExecInfo ...
 type ExecInfo struct {
 	ExecPath string
 }
 
+// ExecCmd ...
 type ExecCmd struct {
 	*exec.Cmd
 	sync.Mutex

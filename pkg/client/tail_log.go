@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TailLog ...
 func TailLog(cliCtx *cli.Context) (err error) {
 	var (
 		addr   = cliCtx.String("addr")
@@ -32,7 +33,7 @@ func TailLog(cliCtx *cli.Context) (err error) {
 }
 
 func tailLog(c pbDebug.QuickDebugClient, follow bool, n int64) error {
-	signalCh := make(chan os.Signal)
+	signalCh := make(chan os.Signal, 2)
 	// 监听信号
 	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	req := pbDebug.TailLogRequest{
