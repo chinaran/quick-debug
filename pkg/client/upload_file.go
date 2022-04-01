@@ -48,7 +48,7 @@ func uploadFile(c pbDebug.QuickDebugClient, filePath string) error {
 	defer stream.CloseSend()
 
 	startAt := time.Now()
-	buf := make([]byte, ChunkSize, ChunkSize)
+	buf := make([]byte, ChunkSize)
 	for {
 		n, err := file.Read(buf)
 		if err != nil {

@@ -11,7 +11,7 @@ import (
 )
 
 func QuickDebug(cmdArgs *CmdArgs) {
-	signalCh := make(chan os.Signal)
+	signalCh := make(chan os.Signal, 2)
 	quitCh := make(chan struct{})
 	doneCh := make(chan struct{})
 	// 监听信号
