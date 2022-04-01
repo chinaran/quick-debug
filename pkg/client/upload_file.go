@@ -13,9 +13,11 @@ import (
 )
 
 const (
+	// ChunkSize for reading uploaded file
 	ChunkSize = 64 * 1024 // 64KB
 )
 
+// UploadFile ...
 func UploadFile(cliCtx *cli.Context) (err error) {
 	var (
 		addr     = cliCtx.String("addr")

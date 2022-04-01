@@ -10,6 +10,7 @@ import (
 	"syscall"
 )
 
+// QuickDebug start a quick-debug server
 func QuickDebug(cmdArgs *CmdArgs) {
 	signalCh := make(chan os.Signal, 2)
 	quitCh := make(chan struct{})

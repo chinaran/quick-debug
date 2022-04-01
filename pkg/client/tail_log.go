@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TailLog ...
 func TailLog(cliCtx *cli.Context) (err error) {
 	var (
 		addr   = cliCtx.String("addr")
